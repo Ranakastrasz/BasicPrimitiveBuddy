@@ -80,7 +80,6 @@ namespace PrimitiveBuddy
         /// <param name="color">The color to draw the polygon.</param>
         void RegularPolygon(Vector2 center, float radius, int sides, float rotation, Color color);
 
-
         /// <summary>
         /// draw a pie shape
         /// </summary>

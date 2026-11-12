@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,10 +36,7 @@ namespace PrimitiveBuddy
         /// </summary>
         public Texture2D Texture
         {
-            get
-            {
-                return _texture;
-            }
+            get => _texture;
             set
             {
                 _texture = value;
@@ -65,8 +61,7 @@ namespace PrimitiveBuddy
         /// </summary>
         public Vector2 Position
         {
-            get { return _position; }
-            set { _position = value; }
+            get => _position; set => _position = value;
         }
 
         /// <summary>
@@ -94,7 +89,7 @@ namespace PrimitiveBuddy
         {
             NumCircleSegments = 20;
             _spriteBatch = spriteBatch;
-            VectorList = new List<Vector2>();
+            VectorList = [];
             Color = Color.White;
 
             // Create the pixel texture.
@@ -113,7 +108,7 @@ namespace PrimitiveBuddy
         {
             NumCircleSegments = 20;
             _spriteBatch = spriteBatch;
-            VectorList = new List<Vector2>();
+            VectorList = [];
             Color = Color.White;
 
             // Create the pixel texture.
@@ -133,7 +128,7 @@ namespace PrimitiveBuddy
 
         public void Dispose()
         {
-            if (_manageTexture && (_texture != null))
+            if(_manageTexture && (_texture != null))
             {
                 _texture.Dispose();
                 _texture = null;
@@ -204,7 +199,7 @@ namespace PrimitiveBuddy
         /// </summary>
         private static List<Vector2> CreateRegularPolygonPoints(Vector2 center, float radius, int sides, float rotation)
         {
-            var points = new List<Vector2>(sides);
+            List<Vector2> points = new(sides);
 
             if(sides < 3 || radius <= 0f)
                 return points;
@@ -214,8 +209,8 @@ namespace PrimitiveBuddy
             for(int i = 0; i < sides; i++)
             {
                 float angle = rotation + (i * step);
-                float x = center.X + radius * (float)Math.Cos(angle);
-                float y = center.Y + radius * (float)Math.Sin(angle);
+                float x = center.X + (radius * (float)Math.Cos(angle));
+                float y = center.Y + (radius * (float)Math.Sin(angle));
                 points.Add(new Vector2(x, y));
             }
 
@@ -227,10 +222,7 @@ namespace PrimitiveBuddy
         /// </summary>
         /// <param name="radius">The radius (half the width) of the circle.</param>
         /// <param name="sides">The number of sides on the circle. (64 is average).</param>
-        private void CreateCircle(float radius, int sides)
-        {
-            CreateArc(radius, sides, 0, MathHelper.TwoPi);
-        }
+        private void CreateCircle(float radius, int sides) => CreateArc(radius, sides, 0, MathHelper.TwoPi);
 
         /// <summary>
         /// Creates an arc starting from (0, 0).
@@ -241,11 +233,11 @@ namespace PrimitiveBuddy
         /// <param name="sweepAngle">The sweep angle.</param>
         private void CreateArc(float radius, int sides, float startAngle, float sweepAngle)
         {
-            float step = sweepAngle / (float)sides;
+            float step = sweepAngle / sides;
 
             // Create the full circle.
-            var numSteps = 0;
-            var theta = startAngle;
+            int numSteps = 0;
+            float theta = startAngle;
             while(numSteps < sides + 1)
             {
                 VectorList.Add(new Vector2(radius * (float)Math.Cos(theta),
@@ -265,8 +257,8 @@ namespace PrimitiveBuddy
         private void CreateEllipse(float semiMajorAxis, float semiMinorAxis, int sides)
         {
             // Local variables.
-            float fMax = (float)MathHelper.TwoPi;
-            float fStep = fMax / (float)sides;
+            float fMax = MathHelper.TwoPi;
+            float fStep = fMax / sides;
 
             // Create the full ellipse.
             for(float fTheta = fMax; fTheta >= -1; fTheta -= fStep)
@@ -291,25 +283,24 @@ namespace PrimitiveBuddy
                 return;
 
             // Local variables.
-            var position1 = Vector2.Zero;
-            var position2 = Vector2.Zero;
-            var angle = 0f;
-            var origin = new Vector2(0, 0.5f);
+            Vector2 unused = Vector2.Zero;
+            Vector2 unused1 = Vector2.Zero;
+            Vector2 origin = new(0, 0.5f);
 
             // Run through the list of vectors.
             for(int i = VectorList.Count - 1; i >= 1; --i)
             {
                 // Store positions.
-                position1 = VectorList[i - 1];
-                position2 = VectorList[i];
+                Vector2 position1 = VectorList[i - 1];
+                Vector2 position2 = VectorList[i];
 
                 // Calculate the distance between the two vectors.
-                var finalPosition = Position + position1;
-                var distance = Vector2.Distance(position1, position2);
-                var destinationRect = new Rectangle((int)finalPosition.X, (int)finalPosition.Y, (int)distance, (int)Thickness);
+                Vector2 finalPosition = Position + position1;
+                float distance = Vector2.Distance(position1, position2);
+                Rectangle destinationRect = new((int)finalPosition.X, (int)finalPosition.Y, (int)distance, (int)Thickness);
 
                 // Calculate the angle between the two vectors.
-                angle = (float)Math.Atan2((double)(position2.Y - position1.Y),
+                float angle = (float)Math.Atan2((double)(position2.Y - position1.Y),
                                      (double)(position2.X - position1.X));
 
                 _spriteBatch.Draw(Texture, destinationRect, null, Color, angle, origin, SpriteEffects.None, Depth);
@@ -429,7 +420,6 @@ namespace PrimitiveBuddy
             RenderLinePrimitive();
         }
 
-
         /// <summary>
         /// Draw a polygon outline.
         /// </summary>
@@ -453,7 +443,7 @@ namespace PrimitiveBuddy
         /// <param name="color">The color to draw the polygon.</param>
         public void RegularPolygon(Vector2 center, float radius, int sides, float rotation, Color color)
         {
-            var points = CreateRegularPolygonPoints(center, radius, sides, rotation);
+            List<Vector2> points = CreateRegularPolygonPoints(center, radius, sides, rotation);
             Polygon(points, color);
         }
 
@@ -492,15 +482,15 @@ namespace PrimitiveBuddy
             Color = color;
 
             // Get the length of the sine wave.
-            var length = (end - start).Length();
+            float length = (end - start).Length();
 
             // Lay out all the points.
             float segmentLength = 5f;
             float xPos = 0f;
             float mid = length / 2f;
-            while ((xPos + segmentLength) < length)
+            while((xPos + segmentLength) < length)
             {
-                var ratio = 1f - (Math.Abs(mid - xPos) / mid);
+                float ratio = 1f - (Math.Abs(mid - xPos) / mid);
                 VectorList.Add(new Vector2(xPos, (float)ratio * (float)(Math.Sin(frequency * xPos) * amplitude)));
                 xPos += segmentLength;
             }
@@ -515,16 +505,13 @@ namespace PrimitiveBuddy
             mat *= Matrix.CreateTranslation(start.X, start.Y, 0f);
 
             // Multiply each point by the combined matrix.
-            for (int i = 0; i < VectorList.Count; i++)
+            for(int i = 0; i < VectorList.Count; i++)
             {
                 VectorList[i] = MatrixExtensions.MatrixExt.Multiply(mat, VectorList[i]);
             }
 
             RenderLinePrimitive();
         }
-
-
-
 
         #endregion // Public Methods
     }
